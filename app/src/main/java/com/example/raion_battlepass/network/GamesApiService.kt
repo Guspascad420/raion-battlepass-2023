@@ -5,7 +5,11 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface GamesApiService {
-    @GET("game")
+
+    @GET("games")
+    suspend fun getAllGames(): List<Game>
+
+    @GET("games")
     suspend fun getGames(
         @Query("category") category: String,
         @Query("platform") platform: String
