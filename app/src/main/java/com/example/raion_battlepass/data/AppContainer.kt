@@ -13,7 +13,7 @@ interface AppContainer {
 class DefaultAppContainer : AppContainer {
 
     private val BASE_URL =
-        "https://www.freetogame.com/api"
+        "https://www.freetogame.com"
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
