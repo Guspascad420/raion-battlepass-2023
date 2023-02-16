@@ -26,20 +26,22 @@ class GameViewModel(private val gamesRepository: GamesRepository) : ViewModel() 
         "Strategy", "Fantasy", "Sci-Fi", "Racing")
     var expanded by mutableStateOf(false)
     var selectedOption by mutableStateOf(options[0])
+    var isPcChecked by mutableStateOf(false)
+    var isBrowserChecked by mutableStateOf(false)
 
     var gameUiState: GameUiState by mutableStateOf(GameUiState.Loading)
         private set
 
-//    init {
-//        getAllGames()
-//    }
+    init {
+        getAllGames()
+    }
 
     private fun getAllGames() {
         gameUiState = GameUiState.Loading
         viewModelScope.launch {
             gameUiState = try {
                 val result = gamesRepository.getAllGames()
-                GameUiState.Success(result.slice(0..9))
+                GameUiState.Success(result.slice(0..15))
             } catch (e: IOException) {
                 GameUiState.Error
             } catch (e: HttpException) {
@@ -53,12 +55,24 @@ class GameViewModel(private val gamesRepository: GamesRepository) : ViewModel() 
         viewModelScope.launch {
             gameUiState = try {
                 val result = gamesRepository.getGames(category, platform)
-                GameUiState.Success(result.slice(0..9))
+                GameUiState.Success(result.slice(0..15))
             } catch (e: IOException) {
                 GameUiState.Error
             } catch (e: HttpException) {
                 GameUiState.Error
             }
+        }
+    }
+
+    fun handleClick() {
+        if (isPcChecked && isBrowserChecked) {
+            getGames(selectedOption, "all")
+        }
+        else if (isPcChecked) {
+            getGames(selectedOption, "pc")
+        }
+        else if (isBrowserChecked) {
+            getGames(selectedOption, "browser")
         }
     }
 
@@ -71,4 +85,5 @@ class GameViewModel(private val gamesRepository: GamesRepository) : ViewModel() 
             }
         }
     }
+
 }
