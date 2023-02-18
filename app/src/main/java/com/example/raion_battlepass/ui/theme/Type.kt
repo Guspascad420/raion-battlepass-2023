@@ -9,7 +9,8 @@ import androidx.compose.ui.unit.sp
 import com.example.raion_battlepass.R
 
 val Roboto = FontFamily(
-    Font(R.font.roboto_bold)
+    Font(R.font.roboto_bold, FontWeight.Bold),
+    Font(R.font.roboto, FontWeight.Normal)
 )
 
 
