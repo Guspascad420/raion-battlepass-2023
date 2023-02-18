@@ -11,12 +11,14 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.raion_battlepass.BattlepassApplication
 import com.example.raion_battlepass.data.GamesRepository
 import com.example.raion_battlepass.model.Game
+import com.example.raion_battlepass.model.GameDetails
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
 sealed interface GameUiState {
     data class Success(val results: List<Game>) : GameUiState
+    data class SuccessDetails(val result: GameDetails) : GameUiState
     object Error : GameUiState
     object Loading : GameUiState
 }
@@ -37,11 +39,15 @@ class GameViewModel(private val gamesRepository: GamesRepository) : ViewModel() 
     }
 
     private fun getAllGames() {
-        gameUiState = GameUiState.Loading
         viewModelScope.launch {
             gameUiState = try {
                 val result = gamesRepository.getAllGames()
-                GameUiState.Success(result.slice(0..15))
+                if (result.size > 15) {
+                    GameUiState.Success(result.slice(0..15))
+                }
+                else {
+                    GameUiState.Success(result)
+                }
             } catch (e: IOException) {
                 GameUiState.Error
             } catch (e: HttpException) {
@@ -51,7 +57,6 @@ class GameViewModel(private val gamesRepository: GamesRepository) : ViewModel() 
     }
 
     private fun getGames(category: String, platform: String) {
-        gameUiState = GameUiState.Loading
         viewModelScope.launch {
             gameUiState = try {
                 val result = gamesRepository.getGames(category, platform)
