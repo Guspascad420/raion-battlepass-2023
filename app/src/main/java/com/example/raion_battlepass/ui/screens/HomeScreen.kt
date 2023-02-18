@@ -1,5 +1,6 @@
 package com.example.raion_battlepass.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -28,7 +29,7 @@ import com.example.raion_battlepass.ui.LoadingSpinner
 import com.example.raion_battlepass.ui.theme.Roboto
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navigateToGameDetails: (Int) -> Unit) {
     val gameViewModel: GameViewModel = viewModel(factory = GameViewModel.Factory)
     val gameUistate = gameViewModel.gameUiState
 
@@ -36,8 +37,11 @@ fun HomeScreen() {
         SearchForm(gameViewModel = gameViewModel)
         when (gameUistate) {
             is GameUiState.Loading -> LoadingScreen()
-            is GameUiState.Success -> GameGridScreen(gameUistate.results)
-            is GameUiState.Error -> ErrorScreen()
+            is GameUiState.Success -> GameGridScreen(
+                gameUistate.results,
+                onCardClick = { navigateToGameDetails(it.id) }
+            )
+            else -> ErrorScreen()
         }
     }
 
@@ -49,7 +53,7 @@ fun SearchForm(gameViewModel: GameViewModel) {
     val options = gameViewModel.options
 
     Column(Modifier.padding(20.dp)) {
-        Text("Categories", fontFamily = Roboto, fontSize = 25.sp, fontWeight = FontWeight.SemiBold)
+        Text("Categories", fontFamily = Roboto, fontSize = 25.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(10.dp))
         ExposedDropdownMenuBox(
             expanded = gameViewModel.expanded,
@@ -71,7 +75,7 @@ fun SearchForm(gameViewModel: GameViewModel) {
                     unfocusedBorderColor = Color.Black,
                     trailingIconColor = Color.Black
                 ),
-                textStyle = TextStyle.Default.copy(fontSize = 18.sp),
+                textStyle = TextStyle.Default.copy(fontSize = 18.sp, color = Color.Black),
                 shape = RoundedCornerShape(10.dp)
             )
 
@@ -92,20 +96,20 @@ fun SearchForm(gameViewModel: GameViewModel) {
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
-        Text("Platform", fontFamily = Roboto, fontSize = 25.sp, fontWeight = FontWeight.SemiBold)
+        Text("Platform", fontFamily = Roboto, fontSize = 25.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(10.dp))
         Row {
             Checkbox(
                 checked = gameViewModel.isPcChecked,
                 onCheckedChange = { gameViewModel.isPcChecked = it },
-                colors = CheckboxDefaults.colors(uncheckedColor = Color.Black)
+                colors = CheckboxDefaults.colors(uncheckedColor = MaterialTheme.colors.onSurface)
             )
             Text("Pc", modifier = Modifier.padding(top = 12.dp))
             Row(Modifier.padding(start = 10.dp)) {
                 Checkbox(
                     checked = gameViewModel.isBrowserChecked,
                     onCheckedChange = { gameViewModel.isBrowserChecked = it },
-                    colors = CheckboxDefaults.colors(uncheckedColor = Color.Black)
+                    colors = CheckboxDefaults.colors(uncheckedColor = MaterialTheme.colors.onSurface)
                 )
                 Text("Browser", modifier = Modifier.padding(top = 12.dp))
             }
@@ -118,23 +122,24 @@ fun SearchForm(gameViewModel: GameViewModel) {
 }
 
 @Composable
-fun GameGridScreen(result: List<Game>) {
+fun GameGridScreen(result: List<Game>, onCardClick: (Game) -> Unit) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier.padding(top = 8.dp)
     ) {
         items(items = result, key = { game -> game.id }) { game ->
-            GameCard(game)
+            GameCard(game, onCardClick = onCardClick)
         }
     }
 }
 
 @Composable
-fun GameCard(game: Game) {
+fun GameCard(game: Game, onCardClick: (Game) -> Unit) {
     Card(
         modifier = Modifier
             .padding(horizontal = 14.dp, vertical = 10.dp)
             .fillMaxWidth()
+            .clickable { onCardClick(game) }
     ) {
         Column {
             AsyncImage(
