@@ -1,5 +1,6 @@
 package com.example.raion_battlepass.data
 
+import android.content.Context
 import com.example.raion_battlepass.network.GamesApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -10,7 +11,7 @@ interface AppContainer {
     val gamesRepository: GamesRepository
 }
 
-class DefaultAppContainer : AppContainer {
+class DefaultAppContainer(private val context: Context) : AppContainer {
 
     private val BASE_URL =
         "https://www.freetogame.com"
@@ -25,6 +26,6 @@ class DefaultAppContainer : AppContainer {
     }
 
     override val gamesRepository: GamesRepository by lazy {
-        DefaultGamesRepository(retrofitService)
+        DefaultGamesRepository(retrofitService, GameDatabase.getDatabase(context).gameDao())
     }
 }
