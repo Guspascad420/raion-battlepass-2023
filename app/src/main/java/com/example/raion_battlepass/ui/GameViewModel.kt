@@ -42,6 +42,19 @@ class GameViewModel(private val gamesRepository: GamesRepository) : ViewModel() 
         viewModelScope.launch {
             gameUiState = try {
                 val result = gamesRepository.getAllGames()
+                GameUiState.Success(result.slice(0..15))
+            } catch (e: IOException) {
+                GameUiState.Error
+            } catch (e: HttpException) {
+                GameUiState.Error
+            }
+        }
+    }
+
+    private fun getGames(category: String, platform: String) {
+        viewModelScope.launch {
+            gameUiState = try {
+                val result = gamesRepository.getGames(category, platform)
                 if (result.size > 15) {
                     GameUiState.Success(result.slice(0..15))
                 }
@@ -56,21 +69,8 @@ class GameViewModel(private val gamesRepository: GamesRepository) : ViewModel() 
         }
     }
 
-    private fun getGames(category: String, platform: String) {
-        viewModelScope.launch {
-            gameUiState = try {
-                val result = gamesRepository.getGames(category, platform)
-                GameUiState.Success(result.slice(0..15))
-            } catch (e: IOException) {
-                GameUiState.Error
-            } catch (e: HttpException) {
-                GameUiState.Error
-            }
-        }
-    }
-
     fun handleClick() {
-        if (isPcChecked && isBrowserChecked) {
+        if ((isPcChecked && isBrowserChecked) || (!isPcChecked && !isBrowserChecked)) {
             getGames(selectedOption, "all")
         }
         else if (isPcChecked) {
