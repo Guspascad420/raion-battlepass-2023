@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.raion_battlepass.ui.screens.FavoriteGameScreen
 import com.example.raion_battlepass.ui.screens.GameDetailsScreen
 import com.example.raion_battlepass.ui.screens.HomeScreen
 import com.example.raion_battlepass.ui.theme.Roboto
@@ -28,14 +29,11 @@ fun BattlepassApp(navController: NavHostController = rememberNavController()) {
 fun BattlepassNavHost(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.Games.route) {
         composable(route = Screen.Games.route) {
-            Scaffold(bottomBar = { GameBottomAppBar() }) { innerPadding ->
-                Surface(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding), color = MaterialTheme.colors.background
-                ) {
-                    HomeScreen { navController.navigate(Screen.Games.route + "/$it") }
-                }
+            AppLayout(
+                navigateToHome = { navController.navigate(Screen.Games.route) },
+                navigateToFavorite = { navController.navigate(Screen.Favorite.route) }
+            ) {
+                HomeScreen { navController.navigate(Screen.Games.route + "/$it") }
             }
         }
         composable(
@@ -44,24 +42,54 @@ fun BattlepassNavHost(navController: NavHostController) {
                 type = NavType.IntType
             })
         ) {
-            Scaffold(bottomBar = { GameBottomAppBar() }) {
-                Surface(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(it), color = MaterialTheme.colors.background
-                ) {
-                    GameDetailsScreen()
-                }
+            AppLayout(
+                navigateToHome = { navController.navigate(Screen.Games.route) },
+                navigateToFavorite = { navController.navigate(Screen.Favorite.route) }
+            ) {
+                GameDetailsScreen()
+            }
+        }
+        composable(route = Screen.Favorite.route) {
+            AppLayout(
+                navigateToHome = { navController.navigate(Screen.Games.route) },
+                navigateToFavorite = { navController.navigate(Screen.Favorite.route) }
+            ) {
+                FavoriteGameScreen(navigateToGameDetails = { navController.navigate(Screen.Games.route + "/$it") })
             }
         }
     }
 }
 
 @Composable
-fun GameBottomAppBar() {
+fun AppLayout(
+    navigateToHome: () -> Unit,
+    navigateToFavorite: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Scaffold(bottomBar = {
+        GameBottomAppBar(
+            navigateToHome = navigateToHome,
+            navigateToFavorite = navigateToFavorite
+        )
+    }) { innerPadding ->
+        Surface(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding), color = MaterialTheme.colors.background
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun GameBottomAppBar(
+    navigateToHome: () -> Unit,
+    navigateToFavorite: () -> Unit
+) {
     BottomAppBar {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            IconButton(onClick = { /*TODO*/ }, Modifier.padding(horizontal = 25.dp)) {
+            IconButton(onClick = navigateToHome, Modifier.padding(horizontal = 25.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.Home, contentDescription = null)
                     Text(
@@ -69,9 +97,8 @@ fun GameBottomAppBar() {
                         fontFamily = Roboto
                     )
                 }
-
             }
-            IconButton(onClick = { /*TODO*/ }, Modifier.padding(horizontal = 25.dp)) {
+            IconButton(onClick = navigateToFavorite, Modifier.padding(horizontal = 25.dp)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Icon(Icons.Default.Star, contentDescription = null)
                     Text(
