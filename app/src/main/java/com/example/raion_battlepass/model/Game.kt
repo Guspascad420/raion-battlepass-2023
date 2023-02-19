@@ -25,5 +25,6 @@ data class FavGame(
     val title: String,
     val release_date: String,
     val platform: String,
-    val publisher: String
+    val publisher: String,
+    val thumbnail: String
 )
