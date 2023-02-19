@@ -38,9 +38,8 @@ fun HomeScreen(navigateToGameDetails: (Int) -> Unit) {
         when (gameUistate) {
             is GameUiState.Loading -> LoadingScreen()
             is GameUiState.Success -> GameGridScreen(
-                gameUistate.results,
-                onCardClick = { navigateToGameDetails(it.id) }
-            )
+                gameUistate.results
+            ) { navigateToGameDetails(it.id) }
             else -> ErrorScreen()
         }
     }
