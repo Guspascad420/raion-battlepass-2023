@@ -9,10 +9,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.raion_battlepass.BattlepassApplication
 import com.example.raion_battlepass.data.GamesRepository
 import com.example.raion_battlepass.model.FavGame
+import com.example.raion_battlepass.model.Game
 import com.example.raion_battlepass.model.GameDetails
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -26,7 +24,7 @@ class GameDetailsViewModel(
     var gameUiState: GameUiState by mutableStateOf(GameUiState.Loading)
         private set
     var isFavorite by mutableStateOf(false)
-    var favGameResponse by mutableStateOf(FavGame(0 , "", "", "", ""))
+    var favGameResponse by mutableStateOf(FavGame(0 , "", "", "", "", ""))
 
     init {
         getGameDetails(gameId)
@@ -83,5 +81,20 @@ fun GameDetails.toFavGame(): FavGame = FavGame(
     title = title,
     release_date = releaseDate,
     platform = platform,
-    publisher = publisher
+    publisher = publisher,
+    thumbnail = thumbnail
+)
+
+fun FavGame.toGame(): Game = Game(
+    id = id,
+    title = title,
+    release_date = release_date,
+    platform = platform,
+    publisher = publisher,
+    thumbnail = thumbnail,
+    developer = "",
+    freetogame_profile_url = "",
+    game_url = "",
+    genre = "",
+    short_description = ""
 )
